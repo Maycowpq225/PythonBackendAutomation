@@ -45,7 +45,13 @@ jobs:
       - name: Run tests
         run: |
           if [ "${{ github.event.inputs.TAGS }}" = "all" ]; then
-            pytest -v
+            pytest -v --html=report.html
           else
-            pytest -m "${{ github.event.inputs.TAGS }}" -v
+            pytest -m "${{ github.event.inputs.TAGS }}" -v --html=report.html
           fi
+
+      - name: Upload test report
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-report
+          path: report.html
