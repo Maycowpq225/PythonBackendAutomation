@@ -4,7 +4,6 @@ from dotenv import load_dotenv
 
 class DBConnection:
     def __init__(self):
-        load_dotenv(os.path.join('env', "db.env"))
 
         self.conn = mysql.connector.connect(
             host=os.getenv("DB_HOST"),

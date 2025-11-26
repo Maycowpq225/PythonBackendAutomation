@@ -1,0 +1,51 @@
+name: Run Tests
+
+on:
+  workflow_dispatch:
+    inputs:
+      ENV:
+        type: choice
+        description: "Environment"
+        options:
+          - prod
+      TAGS:
+        description: "Tag to execute"
+        required: true
+        default: "regression"
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13.9"
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Set DB secrets
+        run: |
+          echo "DB_HOST=${{ secrets.DB_HOST }}" >> $GITHUB_ENV
+          echo "DB_PORT=${{ secrets.DB_PORT }}" >> $GITHUB_ENV
+          echo "DB_USER=${{ secrets.DB_USER }}" >> $GITHUB_ENV
+          echo "DB_PASS=${{ secrets.DB_PASS }}" >> $GITHUB_ENV
+          echo "DB_NAME=${{ secrets.DB_NAME }}" >> $GITHUB_ENV
+
+      - name: Set inputs
+        run: |
+          echo "ENV=${{ github.event.inputs.ENV }}" >> $GITHUB_ENV
+          echo "TAGS=${{ github.event.inputs.TAGS }}" >> $GITHUB_ENV
+
+      - name: Run tests
+        run: |
+          if [ "${{ github.event.inputs.TAGS }}" = "all" ]; then
+            pytest -v
+          else
+            pytest -m "${{ github.event.inputs.TAGS }}" -v
+          fi

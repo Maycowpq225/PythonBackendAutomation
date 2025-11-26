@@ -5,6 +5,7 @@ from tests.db import provider_table
 from utils.asserts import assert_json
 
 @pytest.mark.provider
+@pytest.mark.regression
 def test_create_user():
     request = provider_service.create_user()
     request_payload = json.loads(request.request.body)
